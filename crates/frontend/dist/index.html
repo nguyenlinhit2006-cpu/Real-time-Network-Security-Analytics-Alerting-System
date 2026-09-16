@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Real-time Network Security Analytics & Alerting System</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Plus Jakarta Sans', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            colors: {
+              brand: {
+                50: '#f0fdf4',
+                500: '#22c55e',
+                600: '#16a34a',
+                700: '#15803d',
+              },
+              dark: {
+                900: '#0b0f19',
+                800: '#111827',
+                700: '#1f2937',
+              }
+            }
+          }
+        }
+      }
+    </script>
+    
+<script type="module">
+import init, * as bindings from '/frontend-b0cf5d6c7a4ba9a6.js';
+const wasm = await init({ module_or_path: '/frontend-b0cf5d6c7a4ba9a6_bg.wasm' });
+
+
+window.wasmBindings = bindings;
+
+
+dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
+
+</script>
+  <link rel="modulepreload" href="/frontend-b0cf5d6c7a4ba9a6.js" crossorigin="anonymous" integrity="sha384-Fs01C54uo6U4TrgGMDslxeNaIanNEoSQ4dpaqQ0sZF9kkzbBiFuHHDjxnj3lQwyy"><link rel="preload" href="/frontend-b0cf5d6c7a4ba9a6_bg.wasm" crossorigin="anonymous" integrity="sha384-3cB6HjVCaahgAlC3bbWj/f+CoHU5YBu3EFyyLHEySZr/lKcxAom1ge4jlOKwdv8h" as="fetch" type="application/wasm"></head>
+  <body class="bg-slate-950 text-slate-100 font-sans antialiased min-h-screen">
+    <div id="app"></div>
+  </body>
+</html>

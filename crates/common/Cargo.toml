@@ -1,0 +1,21 @@
+[package]
+name = "common"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+chrono = { workspace = true }
+uuid = { workspace = true }
+ipnetwork = { workspace = true }
+sqlx = { workspace = true, optional = true }
+utoipa = { workspace = true, optional = true }
+validator = { workspace = true }
+
+[features]
+default = ["sqlx", "utoipa"]
+sqlx = ["dep:sqlx"]
+utoipa = ["dep:utoipa"]

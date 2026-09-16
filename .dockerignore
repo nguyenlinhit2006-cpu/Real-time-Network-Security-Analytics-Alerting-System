@@ -1,0 +1,6 @@
+target/
+crates/frontend/dist/
+.git/
+.env
+.dev-env.sh
+*.log

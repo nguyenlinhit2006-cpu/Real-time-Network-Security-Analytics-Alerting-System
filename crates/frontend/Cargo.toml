@@ -1,0 +1,39 @@
+[package]
+name = "frontend"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+common = { workspace = true, default-features = false }
+leptos = { version = "0.7", features = ["csr"] }
+leptos_router = { version = "0.7" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+chrono = { workspace = true }
+uuid = { workspace = true, features = ["js"] }
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+js-sys = "0.3"
+web-sys = { version = "0.3", features = [
+
+    "WebSocket",
+    "MessageEvent",
+    "CloseEvent",
+    "ErrorEvent",
+    "BinaryType",
+    "Window",
+    "Document",
+    "HtmlElement",
+    "Storage",
+    "Headers",
+    "Request",
+    "RequestInit",
+    "Response",
+] }
+gloo-net = "0.6"
+gloo-timers = { version = "0.3", features = ["futures"] }
+console_error_panic_hook = "0.1"
+console_log = "1.0"
+log = "0.4"

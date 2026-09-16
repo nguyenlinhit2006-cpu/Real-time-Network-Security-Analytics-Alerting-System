@@ -1,0 +1,80 @@
+[workspace]
+members = [
+    "crates/common",
+    "crates/capture-engine",
+    "crates/backend",
+    "crates/frontend",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["Network Security Analytics Team"]
+license = "MIT OR Apache-2.0"
+
+[workspace.dependencies]
+# Shared internal crate
+common = { path = "crates/common", default-features = false }
+
+# Async & Runtime
+tokio = { version = "1.40", features = ["full"] }
+tokio-util = { version = "0.7", features = ["codec"] }
+futures = "0.3"
+
+# Web Backend
+axum = { version = "0.7", features = ["ws", "macros", "multipart"] }
+tower = { version = "0.5", features = ["util"] }
+tower-http = { version = "0.5", features = ["cors", "trace", "fs"] }
+
+# Database & SQLx
+sqlx = { version = "0.8", default-features = false, features = [
+    "runtime-tokio-rustls",
+    "postgres",
+    "macros",
+    "chrono",
+    "uuid",
+    "json",
+    "ipnetwork",
+    "migrate",
+] }
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.10", features = ["v4", "serde"] }
+ipnetwork = { version = "0.20", features = ["serde"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Logging & Tracing
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt", "json"] }
+
+# Security & Auth
+jsonwebtoken = "9.3"
+argon2 = "0.5"
+rand = "0.8"
+validator = { version = "0.18", features = ["derive"] }
+
+# Config & Env
+config = "0.14"
+dotenvy = "0.15"
+
+# Error Handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# OpenAPI documentation
+utoipa = { version = "4.2", features = ["chrono", "uuid", "axum_extras"] }
+utoipa-swagger-ui = { version = "7.1", features = ["axum"] }
+
+# Network Capture & Packet Processing
+pnet = "0.35"
+pcap = "2.2"
+
+# Notifications
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+lettre = { version = "0.11", default-features = false, features = ["tokio1-rustls-tls", "smtp-transport", "builder"] }
+
+# In-memory store & Throttling
+dashmap = "6.0"

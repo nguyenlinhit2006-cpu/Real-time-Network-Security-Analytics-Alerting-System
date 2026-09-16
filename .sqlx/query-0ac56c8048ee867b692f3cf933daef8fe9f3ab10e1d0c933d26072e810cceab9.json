@@ -1,0 +1,32 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT \n            dst_port::TEXT as port_str,\n            COUNT(*)::BIGINT as port_count,\n            COALESCE(SUM(bytes_transferred), 0)::BIGINT as total_bytes\n        FROM traffic_events\n        GROUP BY dst_port\n        ORDER BY port_count DESC\n        LIMIT 5\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "port_str",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "port_count",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "total_bytes",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "0ac56c8048ee867b692f3cf933daef8fe9f3ab10e1d0c933d26072e810cceab9"
+}

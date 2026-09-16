@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT COUNT(*)::BIGINT as total_alerts FROM alerts",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "total_alerts",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "2f16161f397a5867c301d5efd7cea6cbd45c2efe3aac66dd807a431e5188594c"
+}

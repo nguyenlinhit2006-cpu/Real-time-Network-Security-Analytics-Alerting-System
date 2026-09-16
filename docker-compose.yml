@@ -1,0 +1,83 @@
+services:
+  timescaledb:
+    image: timescale/timescaledb:latest-pg15
+    container_name: secnet_timescaledb
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-network_security}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - timescale_data:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d:ro
+    networks:
+      - secnet_mesh
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-network_security}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: ./crates/backend/Dockerfile
+    container_name: secnet_backend
+    restart: unless-stopped
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@timescaledb:5432/${POSTGRES_DB:-network_security}
+      SERVER_HOST: 0.0.0.0
+      SERVER_PORT: 8080
+      JWT_SECRET: ${JWT_SECRET:-super_secret_jwt_key_at_least_32_bytes_long_12345}
+      CORS_ALLOWED_ORIGIN: ${CORS_ALLOWED_ORIGIN:-http://localhost:3000}
+      RUST_LOG: ${RUST_LOG:-info,backend=debug}
+    ports:
+      - "8080:8080"
+    networks:
+      - secnet_mesh
+
+  frontend:
+    build:
+      context: .
+      dockerfile: ./crates/frontend/Dockerfile
+    container_name: secnet_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    networks:
+      - secnet_mesh
+
+  capture-engine:
+    build:
+      context: .
+      dockerfile: ./crates/capture-engine/Dockerfile
+    container_name: secnet_capture_engine
+    restart: unless-stopped
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+      backend:
+        condition: service_started
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@timescaledb:5432/${POSTGRES_DB:-network_security}
+      SIMULATION_MODE: "true"
+      SIMULATION_PACKETS_PER_SEC: 500
+      CAPTURE_INTERFACE: "eth0"
+      RUST_LOG: "info,capture_engine=debug"
+    networks:
+      - secnet_mesh
+
+networks:
+  secnet_mesh:
+    driver: bridge
+
+volumes:
+  timescale_data:
+    driver: local
