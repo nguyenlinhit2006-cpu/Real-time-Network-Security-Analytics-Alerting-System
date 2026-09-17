@@ -7,7 +7,7 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico"/>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Oxanium:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -15,29 +15,94 @@
         theme: {
           extend: {
             fontFamily: {
-              sans: ['Plus Jakarta Sans', 'sans-serif'],
+              sans: ['Oxanium', 'sans-serif'],
               mono: ['JetBrains Mono', 'monospace'],
             },
             colors: {
-              brand: {
-                50: '#f0fdf4',
-                500: '#22c55e',
-                600: '#16a34a',
-                700: '#15803d',
+              ink: {
+                950: '#080B11',
+                900: '#0B0F17',
+                800: '#0F141D',
+                700: '#141B27',
+                600: '#1B2433',
+                500: '#2A3446',
               },
-              dark: {
-                900: '#0b0f19',
-                800: '#111827',
-                700: '#1f2937',
-              }
-            }
+              brand: {
+                DEFAULT: '#26D9CB',
+                light: '#7CEDE2',
+                dark: '#0F9C93',
+              },
+              sev: {
+                critical: '#FB4B5A',
+                high: '#FF9D4D',
+                medium: '#FFD166',
+                low: '#7A879C',
+              },
+            },
+            boxShadow: {
+              console: '0 0 0 1px rgba(38,217,203,0.06), 0 20px 60px -30px rgba(0,0,0,0.8)',
+            },
           }
         }
       }
     </script>
     <link data-trunk rel="rust" data-wasm-opt="z" />
+    <style>
+      html { color-scheme: dark; }
+      body {
+        background-color: #080B11;
+        background-image:
+          linear-gradient(rgba(38,217,203,0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(38,217,203,0.05) 1px, transparent 1px);
+        background-size: 42px 42px;
+        background-attachment: fixed;
+      }
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        background: radial-gradient(ellipse 60% 45% at 50% -10%, rgba(38,217,203,0.10), transparent 60%);
+      }
+      #app { position: relative; z-index: 1; }
+
+      ::-webkit-scrollbar { width: 9px; height: 9px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: #1B2433; border-radius: 3px; }
+      ::-webkit-scrollbar-thumb:hover { background: #2A3446; }
+
+      *:focus-visible {
+        outline: 2px solid #26D9CB;
+        outline-offset: 2px;
+      }
+
+      @keyframes sweep-rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      @keyframes ring-expand {
+        0% { transform: scale(0.6); opacity: 0.6; }
+        100% { transform: scale(1.8); opacity: 0; }
+      }
+      @keyframes blink-caret {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.15; }
+      }
+      @keyframes slide-in-console {
+        from { transform: translateX(16px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      .anim-sweep { animation: sweep-rotate 3.2s linear infinite; }
+      .anim-caret { animation: blink-caret 1.4s steps(1) infinite; }
+      .anim-slide-in { animation: slide-in-console 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
+
+      @media (prefers-reduced-motion: reduce) {
+        .anim-sweep, .anim-caret, .anim-slide-in { animation: none !important; }
+      }
+    </style>
   </head>
-  <body class="bg-slate-950 text-slate-100 font-sans antialiased min-h-screen">
+  <body class="bg-ink-950 text-slate-100 font-sans antialiased min-h-screen">
     <div id="app"></div>
   </body>
 </html>

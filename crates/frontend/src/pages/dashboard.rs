@@ -2,6 +2,7 @@ use common::models::{Alert, AlertSeverity, TrafficSummaryDto};
 use leptos::prelude::*;
 
 use crate::api::client::ApiClient;
+use crate::components::icons::{IconAlert, IconArrowRight, IconBan, IconDownload, IconPulse};
 use crate::components::{SeverityDonut, TrafficChart};
 
 #[component]
@@ -46,30 +47,36 @@ pub fn DashboardPage(
     view! {
         <div class="space-y-6">
             // Page Header & Quick Controls
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-ink-700">
                 <div>
-                    <h1 class="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2.5">
-                        <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
-                        "Security Operations Center (SOC) Overview"
+                    <div class="flex items-center gap-2 text-[10px] font-mono text-brand uppercase tracking-[0.15em] mb-2">
+                        <span class="relative flex w-1.5 h-1.5">
+                            <span class="absolute inline-flex h-full w-full rounded-full bg-brand" style="animation: ring-expand 1.6s cubic-bezier(0,0,0.2,1) infinite;"></span>
+                            <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-brand"></span>
+                        </span>
+                        "Live · Security Operations Center"
+                    </div>
+                    <h1 class="text-2xl font-bold text-white tracking-tight">
+                        "Network overview"
                     </h1>
-                    <p class="text-xs text-slate-400 mt-1">
+                    <p class="text-xs text-ink-500 mt-1">
                         "High-speed packet capture stream & automated intrusion detection metrics"
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
                     <button
                         on:click=on_export_report
-                        class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 text-xs font-semibold border border-slate-700/80 shadow-sm transition flex items-center gap-2"
+                        class="px-3.5 py-2 rounded-md bg-ink-900 hover:bg-ink-800 text-slate-200 text-xs font-semibold border border-ink-600 transition-colors flex items-center gap-2"
                     >
-                        <span>"📥"</span>
-                        <span>"Export CSV Report"</span>
+                        <IconDownload class="w-3.5 h-3.5".to_string() />
+                        <span>"Export CSV"</span>
                     </button>
                     <button
                         on:click=move |_| set_active_tab.set("alerts".to_string())
-                        class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/20 transition flex items-center gap-2"
+                        class="px-3.5 py-2 rounded-md bg-brand hover:bg-brand-light text-ink-950 text-xs font-bold transition-colors flex items-center gap-2"
                     >
-                        <span>"🚨"</span>
-                        <span>"Investigate Incidents"</span>
+                        <IconAlert class="w-3.5 h-3.5".to_string() />
+                        <span>"Investigate incidents"</span>
                     </button>
                 </div>
             </div>
@@ -77,64 +84,65 @@ pub fn DashboardPage(
             // Metrics Cards Grid
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 // 1. Throughput
-                <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-5 shadow-lg backdrop-blur-sm">
+                <div class="bg-ink-900/60 border border-ink-600 border-l-2 border-l-brand rounded-lg p-5">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">"Current Throughput"</span>
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                        <span class="text-[10px] font-mono font-semibold text-ink-500 uppercase tracking-wide">"Current throughput"</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-brand animate-ping"></span>
                     </div>
-                    <div class="mt-2 text-2xl font-bold font-mono text-white">
+                    <div class="mt-2 text-2xl font-bold font-mono text-white tabular-nums">
                         {move || format!("{} B/s", throughput.get())}
                     </div>
-                    <div class="mt-2 text-[11px] text-emerald-400 flex items-center gap-1">
-                        <span>"⚡ Live pnet capture stream"</span>
+                    <div class="mt-2 text-[11px] text-brand flex items-center gap-1.5">
+                        <IconPulse class="w-3 h-3".to_string() />
+                        "live pnet capture stream"
                     </div>
                 </div>
 
                 // 2. Total Alerts
-                <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-5 shadow-lg backdrop-blur-sm">
+                <div class="bg-ink-900/60 border border-ink-600 border-l-2 border-l-ink-500 rounded-lg p-5">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">"Total Detected Alerts"</span>
-                        <span class="text-lg">"📊"</span>
+                        <span class="text-[10px] font-mono font-semibold text-ink-500 uppercase tracking-wide">"Total detected alerts"</span>
+                        <IconAlert class="w-3.5 h-3.5 text-ink-500".to_string() />
                     </div>
-                    <div class="mt-2 text-2xl font-bold font-mono text-white">
+                    <div class="mt-2 text-2xl font-bold font-mono text-white tabular-nums">
                         {move || alerts.get().len()}
                     </div>
-                    <div class="mt-2 text-[11px] text-slate-400">
-                        {move || summary.get().map(|s| format!("{} packets analyzed", s.total_packets)).unwrap_or_else(|| "Analyzing stream...".to_string())}
+                    <div class="mt-2 text-[11px] text-ink-500">
+                        {move || summary.get().map(|s| format!("{} packets analyzed", s.total_packets)).unwrap_or_else(|| "Analyzing stream…".to_string())}
                     </div>
                 </div>
 
                 // 3. Critical Incidents
-                <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-5 shadow-lg backdrop-blur-sm">
+                <div class="bg-ink-900/60 border border-ink-600 border-l-2 border-l-sev-critical rounded-lg p-5">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-semibold text-red-400 uppercase tracking-wider">"Critical Incidents"</span>
-                        <span class="text-lg animate-bounce">"🚨"</span>
+                        <span class="text-[10px] font-mono font-semibold text-sev-critical uppercase tracking-wide">"Critical incidents"</span>
+                        <IconAlert class="w-3.5 h-3.5 text-sev-critical".to_string() />
                     </div>
-                    <div class="mt-2 text-2xl font-bold font-mono text-red-400">
+                    <div class="mt-2 text-2xl font-bold font-mono text-sev-critical tabular-nums">
                         {move || critical_alerts.get()}
                     </div>
-                    <div class="mt-2 text-[11px] text-red-400/80 flex items-center gap-1">
-                        <span>"Requires immediate analyst triage"</span>
+                    <div class="mt-2 text-[11px] text-sev-critical/80">
+                        "Requires immediate analyst triage"
                     </div>
                 </div>
 
                 // 4. Blocked IPs
-                <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-5 shadow-lg backdrop-blur-sm">
+                <div class="bg-ink-900/60 border border-ink-600 border-l-2 border-l-ink-500 rounded-lg p-5">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">"Active IP Blocklist"</span>
-                        <span class="text-lg">"⛔"</span>
+                        <span class="text-[10px] font-mono font-semibold text-ink-500 uppercase tracking-wide">"Active IP blocklist"</span>
+                        <IconBan class="w-3.5 h-3.5 text-ink-500".to_string() />
                     </div>
-                    <div class="mt-2 text-2xl font-bold font-mono text-white">
+                    <div class="mt-2 text-2xl font-bold font-mono text-white tabular-nums">
                         {move || blocked_count.get()}
                     </div>
-                    <div class="mt-2 text-[11px] text-emerald-400">
+                    <div class="mt-2 text-[11px] text-brand">
                         "Automated threat mitigation active"
                     </div>
                 </div>
             </div>
 
             // Visual Charts Row
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
                 <div class="lg:col-span-2">
                     <TrafficChart throughput=throughput />
                 </div>
@@ -144,34 +152,31 @@ pub fn DashboardPage(
             </div>
 
             // Two-column section: Top 5 Sources & Recent Threat Incidents
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
                 // Top 5 Source IPs
-                <div class="bg-slate-900/90 border border-slate-800/80 rounded-2xl p-6 shadow-2xl backdrop-blur-md">
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <h3 class="text-sm font-bold text-white tracking-tight flex items-center gap-2">
-                                <span>"🌐"</span>
-                                "Top 5 Traffic Sources"
-                            </h3>
-                            <p class="text-xs text-slate-400">"Highest packet originators in last 24h"</p>
-                        </div>
+                <div class="bg-ink-900/60 border border-ink-600 rounded-lg p-6">
+                    <div class="mb-4">
+                        <h3 class="text-sm font-bold text-white tracking-tight">
+                            "Top traffic sources"
+                        </h3>
+                        <p class="text-xs text-ink-500">"Highest packet originators in last 24h"</p>
                     </div>
 
                     <div class="space-y-3">
                         {move || {
                             if let Some(s) = summary.get() {
                                 if s.top_src_ips.is_empty() {
-                                    view! { <div class="text-xs text-slate-500 italic">"No traffic captured yet"</div> }.into_any()
+                                    view! { <div class="text-xs text-ink-500 italic">"No traffic captured yet"</div> }.into_any()
                                 } else {
                                     view! {
-                                        <div class="divide-y divide-slate-800/60">
+                                        <div class="divide-y divide-ink-700">
                                             {s.top_src_ips.into_iter().take(5).map(|item| {
                                                 view! {
                                                     <div class="py-2.5 flex items-center justify-between text-xs">
                                                         <span class="font-mono text-slate-200">{item.key}</span>
                                                         <div class="text-right">
-                                                            <div class="font-mono font-bold text-emerald-400">{format!("{} pkts", item.count)}</div>
-                                                            <div class="text-[10px] text-slate-400">{format!("{} KB", item.bytes / 1024)}</div>
+                                                            <div class="font-mono font-bold text-brand">{format!("{} pkts", item.count)}</div>
+                                                            <div class="text-[10px] text-ink-500">{format!("{} KB", item.bytes / 1024)}</div>
                                                         </div>
                                                     </div>
                                                 }
@@ -180,70 +185,71 @@ pub fn DashboardPage(
                                     }.into_any()
                                 }
                             } else {
-                                view! { <div class="text-xs text-slate-500">"Loading traffic summary..."</div> }.into_any()
+                                view! { <div class="text-xs text-ink-500">"Loading traffic summary…"</div> }.into_any()
                             }
                         }}
                     </div>
                 </div>
 
                 // Recent Threat Incidents Table Preview (Span 2)
-                <div class="lg:col-span-2 bg-slate-900/90 border border-slate-800/80 rounded-2xl p-6 shadow-2xl backdrop-blur-md">
+                <div class="lg:col-span-2 bg-ink-900/60 border border-ink-600 rounded-lg p-6">
                     <div class="flex items-center justify-between mb-4">
                         <div>
                             <h3 class="text-sm font-bold text-white tracking-tight flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-red-500"></span>
-                                "Latest Threat Incidents"
+                                <span class="w-2 h-2 rounded-full bg-sev-critical"></span>
+                                "Latest threat incidents"
                             </h3>
-                            <p class="text-xs text-slate-400">"Real-time event stream preview"</p>
+                            <p class="text-xs text-ink-500">"Real-time event stream preview"</p>
                         </div>
                         <button
                             on:click=move |_| set_active_tab.set("alerts".to_string())
-                            class="text-xs text-indigo-400 hover:text-indigo-300 transition font-medium"
+                            class="text-xs text-brand hover:text-brand-light transition-colors font-medium flex items-center gap-1"
                         >
-                            "View All Alerts →"
+                            "View all"
+                            <IconArrowRight class="w-3 h-3".to_string() />
                         </button>
                     </div>
 
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs text-slate-300">
 
-                        <thead class="text-slate-400 border-b border-slate-800/80 uppercase tracking-wider font-semibold">
+                        <thead class="text-ink-500 border-b border-ink-600 uppercase tracking-wider font-semibold text-[10px]">
                             <tr>
-                                <th class="pb-3 px-3">"Severity"</th>
-                                <th class="pb-3 px-3">"Title"</th>
-                                <th class="pb-3 px-3">"Source IP"</th>
-                                <th class="pb-3 px-3">"Target IP"</th>
-                                <th class="pb-3 px-3">"Detected At"</th>
+                                <th class="pb-3 px-3 font-mono">"Severity"</th>
+                                <th class="pb-3 px-3 font-mono">"Title"</th>
+                                <th class="pb-3 px-3 font-mono">"Source"</th>
+                                <th class="pb-3 px-3 font-mono">"Target"</th>
+                                <th class="pb-3 px-3 font-mono">"Detected at"</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-800/40">
+                        <tbody class="divide-y divide-ink-700">
                             <For
                                 each=move || recent_alerts.get()
                                 key=|a| a.id
                                 children=move |alert| {
                                     let sev_badge = match alert.severity {
-                                        AlertSeverity::Critical => "bg-red-500/10 text-red-400 border-red-500/30",
-                                        AlertSeverity::High => "bg-amber-500/10 text-amber-400 border-amber-500/30",
-                                        AlertSeverity::Medium => "bg-blue-500/10 text-blue-400 border-blue-500/30",
-                                        AlertSeverity::Low => "bg-slate-500/10 text-slate-400 border-slate-500/30",
+                                        AlertSeverity::Critical => "bg-sev-critical/10 text-sev-critical border-sev-critical/30",
+                                        AlertSeverity::High => "bg-sev-high/10 text-sev-high border-sev-high/30",
+                                        AlertSeverity::Medium => "bg-sev-medium/10 text-sev-medium border-sev-medium/30",
+                                        AlertSeverity::Low => "bg-sev-low/10 text-sev-low border-sev-low/30",
                                     };
                                     view! {
-                                        <tr class="hover:bg-slate-800/30 transition">
+                                        <tr class="hover:bg-ink-800/40 transition-colors">
                                             <td class="py-3 px-3 whitespace-nowrap">
-                                                <span class=format!("inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold border {}", sev_badge)>
+                                                <span class=format!("inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-bold border {}", sev_badge)>
                                                     {format!("{:?}", alert.severity).to_uppercase()}
                                                 </span>
                                             </td>
                                             <td class="py-3 px-3 font-semibold text-slate-200">
                                                 {alert.title}
                                             </td>
-                                            <td class="py-3 px-3 font-mono text-slate-400">
+                                            <td class="py-3 px-3 font-mono text-ink-500">
                                                 {format!("{}", alert.src_ip)}
                                             </td>
-                                            <td class="py-3 px-3 font-mono text-slate-400">
+                                            <td class="py-3 px-3 font-mono text-ink-500">
                                                 {format!("{}", alert.dst_ip)}
                                             </td>
-                                            <td class="py-3 px-3 text-slate-500 whitespace-nowrap">
+                                            <td class="py-3 px-3 text-ink-500 font-mono text-[11px] whitespace-nowrap">
                                                 {alert.detected_at.format("%Y-%m-%d %H:%M:%S").to_string()}
                                             </td>
                                         </tr>
@@ -259,4 +265,3 @@ pub fn DashboardPage(
     </div>
     }
 }
-

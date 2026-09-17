@@ -14,7 +14,7 @@ use crate::{
     path = "/api/auth/register",
     request_body = CreateUserDto,
     responses(
-        (status = 200, description = "User registered successfully", body = ApiResponse<UserPublicDto>),
+        (status = 200, description = "User registered successfully", body = ApiResponse<AuthResponseDto>),
         (status = 400, description = "Validation or duplicate error", body = ApiResponse<()>)
     ),
     tag = "Auth"
@@ -22,7 +22,7 @@ use crate::{
 pub async fn register(
     State(state): State<AppState>,
     Json(payload): Json<CreateUserDto>,
-) -> Result<Json<ApiResponse<UserPublicDto>>, AppError> {
+) -> Result<Json<ApiResponse<AuthResponseDto>>, AppError> {
     payload.validate().map_err(|e| AppError::ValidationError(e.to_string()))?;
 
     let hashed_password = hash_password(&payload.password)?;
@@ -58,7 +58,13 @@ pub async fn register(
     .execute(&state.pool)
     .await;
 
-    Ok(Json(ApiResponse::ok(UserPublicDto::from(user))))
+    let (token, refresh_token) = generate_tokens(&user, &state.jwt_secret, state.jwt_expiration_hours)?;
+
+    Ok(Json(ApiResponse::ok(AuthResponseDto {
+        token,
+        refresh_token,
+        user: UserPublicDto::from(user),
+    })))
 }
 
 #[utoipa::path(

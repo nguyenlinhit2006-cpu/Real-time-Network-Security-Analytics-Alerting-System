@@ -1,4 +1,5 @@
 pub mod alerts_table;
+pub mod icons;
 pub mod navbar;
 pub mod severity_donut;
 pub mod sidebar;

@@ -53,7 +53,7 @@ pub fn App() -> impl IntoView {
     });
 
     view! {
-        <div class="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500/30 selection:text-indigo-300">
+        <div class="min-h-screen text-slate-100 flex flex-col font-sans selection:bg-brand/30 selection:text-brand-light">
             // Navigation Bar
             <Navbar
                 current_user=current_user

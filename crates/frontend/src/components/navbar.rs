@@ -1,6 +1,7 @@
 use common::models::UserPublicDto;
 use leptos::prelude::*;
 use crate::api::client::ApiClient;
+use crate::components::icons::{IconAlert, IconMoon, IconRadar, IconSun};
 
 #[component]
 pub fn Navbar(
@@ -28,7 +29,7 @@ pub fn Navbar(
     };
 
     view! {
-        <header class="h-16 bg-slate-900/95 border-b border-slate-800/80 px-6 flex items-center justify-between sticky top-0 z-40 backdrop-blur-md">
+        <header class="h-16 bg-ink-900/95 border-b border-ink-600 px-4 md:px-6 flex items-center justify-between sticky top-0 z-40">
             // Brand Logo & Status
             <div class="flex items-center gap-4">
                 <button
@@ -39,46 +40,53 @@ pub fn Navbar(
                             set_active_tab.set("login".to_string());
                         }
                     }
-                    class="flex items-center gap-2.5 text-left hover:opacity-90 transition focus:outline-none"
+                    class="flex items-center gap-3 text-left hover:opacity-90 transition focus:outline-none"
                 >
-                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-emerald-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
-                        <span class="text-lg">"🛡️"</span>
+                    <div class="relative w-9 h-9 rounded-md border border-brand/40 bg-ink-950 flex items-center justify-center text-brand">
+                        <IconRadar class="w-5 h-5".to_string() />
+                        <span class="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-brand shadow-[0_0_6px_2px_rgba(38,217,203,0.6)]"></span>
                     </div>
                     <div>
-                        <h1 class="text-sm font-bold text-white tracking-tight leading-none">
-                            "SecNet Analytics"
+                        <h1 class="text-sm font-bold text-white tracking-wide leading-none">
+                            "SECNET"<span class="text-brand">"//"</span>"ANALYTICS"
                         </h1>
-                        <span class="text-[10px] text-slate-400 font-mono">
-                            "v1.0.0-phase5"
+                        <span class="text-[10px] text-ink-500 font-mono tracking-wide">
+                            "build v1.0.0-phase5"
                         </span>
                     </div>
                 </button>
 
                 // WS Status Badge
-                <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium border bg-slate-950/80 border-slate-800">
+                <div class="hidden sm:flex items-center gap-2 pl-3 pr-3 py-1.5 rounded-md text-[11px] font-mono border bg-ink-950/80 border-ink-600">
                     {move || if is_ws_connected.get() {
                         view! {
-                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                            <span class="text-emerald-400">"LIVE WS CONNECTED"</span>
+                            <span class="relative flex w-2 h-2">
+                                <span class="absolute inline-flex h-full w-full rounded-full bg-brand" style="animation: ring-expand 1.6s cubic-bezier(0,0,0.2,1) infinite;"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-brand"></span>
+                            </span>
+                            <span class="text-brand tracking-wide">"LINK UP"</span>
                         }.into_any()
                     } else {
                         view! {
-                            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                            <span class="text-amber-400">"RECONNECTING..."</span>
+                            <span class="w-2 h-2 rounded-full bg-sev-high"></span>
+                            <span class="text-sev-high tracking-wide">"RECONNECTING"</span>
                         }.into_any()
                     }}
                 </div>
             </div>
 
             // Right side: Theme Toggle, Critical Alert Counter, User, Logout
-            <div class="flex items-center gap-3">
-                // Dark/Light Theme Toggle
+            <div class="flex items-center gap-2.5">
                 <button
                     on:click=on_toggle_theme
-                    class="p-2 rounded-xl bg-slate-950 border border-slate-800 hover:bg-slate-800 text-slate-300 text-xs transition"
+                    class="p-2 rounded-md bg-ink-950 border border-ink-600 hover:border-brand/40 text-ink-500 hover:text-brand transition-colors"
                     title="Toggle Theme"
                 >
-                    {move || if is_dark.get() { "🌙" } else { "☀️" }}
+                    {move || if is_dark.get() {
+                        view! { <IconMoon class="w-3.5 h-3.5".to_string() /> }.into_any()
+                    } else {
+                        view! { <IconSun class="w-3.5 h-3.5".to_string() /> }.into_any()
+                    }}
                 </button>
 
                 // Critical Alert Badge
@@ -86,9 +94,9 @@ pub fn Navbar(
                     let count = critical_count.get();
                     if count > 0 {
                         view! {
-                            <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold animate-pulse">
-                                <span>"🚨"</span>
-                                <span>{format!("{} CRITICAL", count)}</span>
+                            <div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-sev-critical/10 border border-sev-critical/40 text-sev-critical text-[11px] font-mono font-semibold">
+                                <IconAlert class="w-3.5 h-3.5".to_string() />
+                                <span>{format!("{:02} CRITICAL", count)}</span>
                             </div>
                         }.into_any()
                     } else {
@@ -100,24 +108,24 @@ pub fn Navbar(
                 {move || match current_user.get() {
                     Some(u) => view! {
                         <div class="flex items-center gap-3">
-                            <div class="text-right hidden md:block">
+                            <div class="text-right hidden md:block leading-tight">
                                 <div class="text-xs font-semibold text-slate-200">{u.username}</div>
-                                <div class="text-[10px] font-mono text-indigo-400 uppercase">{format!("{:?}", u.role)}</div>
+                                <div class="text-[10px] font-mono text-brand uppercase tracking-wide">{format!("{:?}", u.role)}</div>
                             </div>
                             <button
-                                class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-700/60 transition"
+                                class="px-3 py-1.5 rounded-md bg-ink-800 hover:bg-ink-700 text-slate-300 text-xs font-medium border border-ink-600 transition-colors"
                                 on:click=on_logout
                             >
-                                "Logout"
+                                "Sign out"
                             </button>
                         </div>
                     }.into_any(),
                     None => view! {
                         <button
                             on:click=on_sign_in
-                            class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium transition"
+                            class="px-3.5 py-1.5 rounded-md bg-brand hover:bg-brand-light text-ink-950 text-xs font-bold transition-colors"
                         >
-                            "Sign In"
+                            "Sign in"
                         </button>
                     }.into_any(),
                 }}

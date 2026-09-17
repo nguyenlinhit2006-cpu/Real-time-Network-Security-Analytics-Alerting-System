@@ -3,6 +3,7 @@ use leptos::prelude::*;
 use uuid::Uuid;
 
 use crate::api::client::ApiClient;
+use crate::components::icons::IconSearch;
 
 #[component]
 pub fn AlertsTable(
@@ -50,31 +51,34 @@ pub fn AlertsTable(
     };
 
     view! {
-        <div class="bg-slate-900/90 border border-slate-800/80 rounded-2xl p-6 shadow-2xl backdrop-blur-md">
+        <div class="bg-ink-900/60 border border-ink-600 rounded-lg p-6">
             // Header and controls
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <div>
-                    <h2 class="text-xl font-bold text-white tracking-tight flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
-                        "Security Incidents & Alerts"
+                    <h2 class="text-base font-bold text-white tracking-tight flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-sev-critical"></span>
+                        "Security incidents"
                     </h2>
-                    <p class="text-xs text-slate-400 mt-0.5">
+                    <p class="text-xs text-ink-500 mt-0.5">
                         "Real-time event analysis and automated incident response feed"
                     </p>
                 </div>
 
                 // Search and filters
                 <div class="flex flex-wrap items-center gap-2">
-                    <input
-                        type="text"
-                        placeholder="Search IP, incident..."
-                        class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 w-48 transition"
-                        on:input=move |e| set_search_query.set(event_target_value(&e))
-                    />
+                    <div class="relative">
+                        <IconSearch class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-ink-500".to_string() />
+                        <input
+                            type="text"
+                            placeholder="Search IP, incident..."
+                            class="bg-ink-950 border border-ink-600 rounded-md pl-8 pr-3 py-1.5 text-xs font-mono text-slate-200 placeholder-ink-500 focus:outline-none focus:border-brand/60 w-48 transition-colors"
+                            on:input=move |e| set_search_query.set(event_target_value(&e))
+                        />
+                    </div>
 
                     // Severity filter
                     <select
-                        class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-indigo-500 transition"
+                        class="bg-ink-950 border border-ink-600 rounded-md px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-brand/60 transition-colors"
                         on:change=move |e| {
                             let val = event_target_value(&e);
                             match val.as_str() {
@@ -86,16 +90,16 @@ pub fn AlertsTable(
                             }
                         }
                     >
-                        <option value="all">"All Severities"</option>
-                        <option value="critical">"Critical Only"</option>
-                        <option value="high">"High Only"</option>
-                        <option value="medium">"Medium Only"</option>
-                        <option value="low">"Low Only"</option>
+                        <option value="all">"All severities"</option>
+                        <option value="critical">"Critical only"</option>
+                        <option value="high">"High only"</option>
+                        <option value="medium">"Medium only"</option>
+                        <option value="low">"Low only"</option>
                     </select>
 
                     // Status filter
                     <select
-                        class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-indigo-500 transition"
+                        class="bg-ink-950 border border-ink-600 rounded-md px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-brand/60 transition-colors"
                         on:change=move |e| {
                             let val = event_target_value(&e);
                             match val.as_str() {
@@ -106,7 +110,7 @@ pub fn AlertsTable(
                             }
                         }
                     >
-                        <option value="all">"All Statuses"</option>
+                        <option value="all">"All statuses"</option>
                         <option value="open">"Open"</option>
                         <option value="acknowledged">"Acknowledged"</option>
                         <option value="resolved">"Resolved"</option>
@@ -117,50 +121,50 @@ pub fn AlertsTable(
             // Table Content
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs text-slate-300">
-                    <thead class="text-slate-400 border-b border-slate-800/80 uppercase tracking-wider font-semibold">
+                    <thead class="text-ink-500 border-b border-ink-600 uppercase tracking-wider font-semibold text-[10px]">
                         <tr>
-                            <th class="pb-3 px-3">"Severity"</th>
-                            <th class="pb-3 px-3">"Title & Description"</th>
-                            <th class="pb-3 px-3">"Source IP"</th>
-                            <th class="pb-3 px-3">"Target IP"</th>
-                            <th class="pb-3 px-3">"Status"</th>
-                            <th class="pb-3 px-3 text-right">"Actions"</th>
+                            <th class="pb-3 px-3 font-mono">"Severity"</th>
+                            <th class="pb-3 px-3 font-mono">"Title & description"</th>
+                            <th class="pb-3 px-3 font-mono">"Source"</th>
+                            <th class="pb-3 px-3 font-mono">"Target"</th>
+                            <th class="pb-3 px-3 font-mono">"Status"</th>
+                            <th class="pb-3 px-3 font-mono text-right">"Actions"</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-800/40">
+                    <tbody class="divide-y divide-ink-700">
                         <For
                             each=move || filtered_alerts.get()
                             key=|alert| alert.id
                             children=move |alert| {
                                 let alert_id = alert.id;
                                 let sev_class = match alert.severity {
-                                    AlertSeverity::Critical => "bg-red-500/10 text-red-400 border-red-500/30",
-                                    AlertSeverity::High => "bg-amber-500/10 text-amber-400 border-amber-500/30",
-                                    AlertSeverity::Medium => "bg-blue-500/10 text-blue-400 border-blue-500/30",
-                                    AlertSeverity::Low => "bg-slate-500/10 text-slate-400 border-slate-500/30",
+                                    AlertSeverity::Critical => "bg-sev-critical/10 text-sev-critical border-sev-critical/30",
+                                    AlertSeverity::High => "bg-sev-high/10 text-sev-high border-sev-high/30",
+                                    AlertSeverity::Medium => "bg-sev-medium/10 text-sev-medium border-sev-medium/30",
+                                    AlertSeverity::Low => "bg-sev-low/10 text-sev-low border-sev-low/30",
                                 };
 
                                 let status_badge = match alert.status {
-                                    AlertStatus::Open => "bg-red-500/10 text-red-400 border border-red-500/20",
-                                    AlertStatus::Acknowledged => "bg-amber-500/10 text-amber-400 border border-amber-500/20",
-                                    AlertStatus::Resolved => "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
+                                    AlertStatus::Open => "bg-sev-critical/10 text-sev-critical border border-sev-critical/20",
+                                    AlertStatus::Acknowledged => "bg-sev-high/10 text-sev-high border border-sev-high/20",
+                                    AlertStatus::Resolved => "bg-brand/10 text-brand border border-brand/20",
                                 };
 
                                 view! {
-                                    <tr class="hover:bg-slate-800/30 transition group">
+                                    <tr class="hover:bg-ink-800/40 transition-colors group">
                                         // Severity Pill
                                         <td class="py-3.5 px-3 whitespace-nowrap">
-                                            <span class=format!("inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold border {}", sev_class)>
+                                            <span class=format!("inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-bold border {}", sev_class)>
                                                 {format!("{:?}", alert.severity).to_uppercase()}
                                             </span>
                                         </td>
 
                                         // Title & Description
                                         <td class="py-3.5 px-3 max-w-sm">
-                                            <div class="font-semibold text-slate-100 group-hover:text-indigo-300 transition">
+                                            <div class="font-semibold text-slate-100 group-hover:text-brand transition-colors">
                                                 {alert.title}
                                             </div>
-                                            <div class="text-slate-400 text-[11px] truncate mt-0.5">
+                                            <div class="text-ink-500 text-[11px] truncate mt-0.5">
                                                 {alert.description}
                                             </div>
                                         </td>
@@ -177,8 +181,8 @@ pub fn AlertsTable(
 
                                         // Status
                                         <td class="py-3.5 px-3 whitespace-nowrap">
-                                            <span class=format!("inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium {}", status_badge)>
-                                                {format!("{:?}", alert.status)}
+                                            <span class=format!("inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-mono font-medium {}", status_badge)>
+                                                {format!("{:?}", alert.status).to_uppercase()}
                                             </span>
                                         </td>
 
@@ -188,7 +192,7 @@ pub fn AlertsTable(
                                                 {if alert.status == AlertStatus::Open {
                                                     view! {
                                                         <button
-                                                            class="px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[11px] font-medium transition"
+                                                            class="px-2.5 py-1 rounded bg-sev-high/10 hover:bg-sev-high/20 text-sev-high border border-sev-high/30 text-[11px] font-medium transition-colors"
                                                             on:click=move |_| on_update_status(alert_id, AlertStatus::Acknowledged)
                                                         >
                                                             "Acknowledge"
@@ -197,7 +201,7 @@ pub fn AlertsTable(
                                                 } else if alert.status == AlertStatus::Acknowledged {
                                                     view! {
                                                         <button
-                                                            class="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[11px] font-medium transition"
+                                                            class="px-2.5 py-1 rounded bg-brand/10 hover:bg-brand/20 text-brand border border-brand/30 text-[11px] font-medium transition-colors"
                                                             on:click=move |_| on_update_status(alert_id, AlertStatus::Resolved)
                                                         >
                                                             "Resolve"
@@ -205,7 +209,7 @@ pub fn AlertsTable(
                                                     }.into_any()
                                                 } else {
                                                     view! {
-                                                        <span class="text-slate-600 text-[11px] italic">"Closed"</span>
+                                                        <span class="text-ink-600 text-[11px] italic">"Closed"</span>
                                                     }.into_any()
                                                 }}
                                             </div>
@@ -220,4 +224,3 @@ pub fn AlertsTable(
         </div>
     }
 }
-

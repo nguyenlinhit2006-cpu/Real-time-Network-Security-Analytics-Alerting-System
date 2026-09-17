@@ -3,6 +3,7 @@ use leptos::prelude::*;
 use uuid::Uuid;
 
 use crate::api::client::ApiClient;
+use crate::components::icons::{IconClose, IconPlus, IconSliders};
 
 #[component]
 pub fn RulesPage() -> impl IntoView {
@@ -86,22 +87,21 @@ pub fn RulesPage() -> impl IntoView {
     view! {
         <div class="space-y-6">
             // Header
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-ink-700">
                 <div>
-                    <h1 class="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2.5">
-                        <span>"⚙️"</span>
-                        "Intrusion Detection Engine Rules"
+                    <h1 class="text-2xl font-bold text-white tracking-tight">
+                        "Detection rules"
                     </h1>
-                    <p class="text-xs text-slate-400 mt-1">
+                    <p class="text-xs text-ink-500 mt-1">
                         "Manage multi-pattern detection thresholds, time windows, and real-time triggers."
                     </p>
                 </div>
                 <button
                     on:click=move |_| set_show_create_modal.set(true)
-                    class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/20 transition flex items-center gap-2"
+                    class="px-3.5 py-2 rounded-md bg-brand hover:bg-brand-light text-ink-950 text-xs font-bold transition-colors flex items-center gap-2"
                 >
-                    <span>"➕"</span>
-                    <span>"Create Detection Rule"</span>
+                    <IconPlus class="w-3.5 h-3.5".to_string() />
+                    <span>"New rule"</span>
                 </button>
             </div>
 
@@ -109,9 +109,9 @@ pub fn RulesPage() -> impl IntoView {
             {move || {
                 if let Some(msg) = status_msg.get() {
                     view! {
-                        <div class="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs flex items-center justify-between">
+                        <div class="p-3 rounded-md bg-brand/10 border border-brand/30 text-brand text-xs flex items-center justify-between font-mono">
                             <span>{msg}</span>
-                            <button on:click=move |_| set_status_msg.set(None) class="text-slate-400 hover:text-white">"✕"</button>
+                            <button on:click=move |_| set_status_msg.set(None) class="text-ink-500 hover:text-white"><IconClose class="w-3 h-3".to_string() /></button>
                         </div>
                     }.into_any()
                 } else {
@@ -124,25 +124,25 @@ pub fn RulesPage() -> impl IntoView {
                 if show_create_modal.get() {
                     view! {
                         <div class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-md w-full shadow-2xl">
-                                <h3 class="text-base font-bold text-white mb-4">"New Detection Rule"</h3>
+                            <div class="bg-ink-900 border border-ink-600 rounded-lg p-6 max-w-md w-full shadow-console">
+                                <h3 class="text-base font-bold text-white mb-4">"New detection rule"</h3>
                                 <form on:submit=on_create_rule class="space-y-4">
                                     <div>
-                                        <label class="block text-xs font-semibold text-slate-300 mb-1.5">"Rule Name"</label>
+                                        <label class="block text-[11px] font-mono font-semibold text-ink-500 uppercase tracking-wide mb-1.5">"Rule name"</label>
                                         <input
                                             type="text"
                                             required
                                             placeholder="e.g. Excessive DNS Query Flood"
-                                            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
+                                            class="w-full bg-ink-950 border border-ink-600 rounded-md px-3.5 py-2 text-xs text-slate-200 placeholder-ink-600 focus:outline-none focus:border-brand/60 transition-colors"
                                             prop:value=new_name
                                             on:input=move |e| set_new_name.set(event_target_value(&e))
                                         />
                                     </div>
                                     <div class="grid grid-cols-2 gap-3">
                                         <div>
-                                            <label class="block text-xs font-semibold text-slate-300 mb-1.5">"Rule Type"</label>
+                                            <label class="block text-[11px] font-mono font-semibold text-ink-500 uppercase tracking-wide mb-1.5">"Rule type"</label>
                                             <select
-                                                class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-indigo-500 transition"
+                                                class="w-full bg-ink-950 border border-ink-600 rounded-md px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-brand/60 transition-colors"
                                                 on:change=move |e| {
                                                     match event_target_value(&e).as_str() {
                                                         "pattern" => set_new_rule_type.set(RuleType::Pattern),
@@ -157,9 +157,9 @@ pub fn RulesPage() -> impl IntoView {
                                             </select>
                                         </div>
                                         <div>
-                                            <label class="block text-xs font-semibold text-slate-300 mb-1.5">"Severity"</label>
+                                            <label class="block text-[11px] font-mono font-semibold text-ink-500 uppercase tracking-wide mb-1.5">"Severity"</label>
                                             <select
-                                                class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-indigo-500 transition"
+                                                class="w-full bg-ink-950 border border-ink-600 rounded-md px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-brand/60 transition-colors"
                                                 on:change=move |e| {
                                                     match event_target_value(&e).as_str() {
                                                         "critical" => set_new_severity.set(AlertSeverity::Critical),
@@ -178,12 +178,12 @@ pub fn RulesPage() -> impl IntoView {
                                     </div>
                                     <div class="grid grid-cols-2 gap-3">
                                         <div>
-                                            <label class="block text-xs font-semibold text-slate-300 mb-1.5">"Threshold Value"</label>
+                                            <label class="block text-[11px] font-mono font-semibold text-ink-500 uppercase tracking-wide mb-1.5">"Threshold value"</label>
                                             <input
                                                 type="number"
                                                 required
                                                 min="1"
-                                                class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 transition"
+                                                class="w-full bg-ink-950 border border-ink-600 rounded-md px-3.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand/60 transition-colors"
                                                 prop:value=new_threshold
                                                 on:input=move |e| {
                                                     if let Ok(val) = event_target_value(&e).parse::<f64>() {
@@ -193,12 +193,12 @@ pub fn RulesPage() -> impl IntoView {
                                             />
                                         </div>
                                         <div>
-                                            <label class="block text-xs font-semibold text-slate-300 mb-1.5">"Window (seconds)"</label>
+                                            <label class="block text-[11px] font-mono font-semibold text-ink-500 uppercase tracking-wide mb-1.5">"Window (seconds)"</label>
                                             <input
                                                 type="number"
                                                 required
                                                 min="1"
-                                                class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 transition"
+                                                class="w-full bg-ink-950 border border-ink-600 rounded-md px-3.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand/60 transition-colors"
                                                 prop:value=new_window
                                                 on:input=move |e| {
                                                     if let Ok(val) = event_target_value(&e).parse::<i32>() {
@@ -211,16 +211,16 @@ pub fn RulesPage() -> impl IntoView {
                                     <div class="flex items-center justify-end gap-3 pt-2">
                                         <button
                                             type="button"
-                                            class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition"
+                                            class="px-3.5 py-2 rounded-md bg-ink-800 hover:bg-ink-700 text-slate-300 text-xs font-medium transition-colors"
                                             on:click=move |_| set_show_create_modal.set(false)
                                         >
                                             "Cancel"
                                         </button>
                                         <button
                                             type="submit"
-                                            class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition shadow-lg shadow-indigo-600/20"
+                                            class="px-4 py-2 rounded-md bg-brand hover:bg-brand-light text-ink-950 text-xs font-bold transition-colors"
                                         >
-                                            "Save Rule"
+                                            "Save rule"
                                         </button>
                                     </div>
                                 </form>
@@ -233,7 +233,7 @@ pub fn RulesPage() -> impl IntoView {
             }}
 
             // Rules Cards Grid
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <For
                     each=move || rules.get()
                     key=|r| r.id
@@ -244,10 +244,10 @@ pub fn RulesPage() -> impl IntoView {
                         let current_window = rule.time_window_seconds;
 
                         let sev_badge = match rule.severity {
-                            AlertSeverity::Critical => "bg-red-500/10 text-red-400 border-red-500/30",
-                            AlertSeverity::High => "bg-amber-500/10 text-amber-400 border-amber-500/30",
-                            AlertSeverity::Medium => "bg-blue-500/10 text-blue-400 border-blue-500/30",
-                            AlertSeverity::Low => "bg-slate-500/10 text-slate-400 border-slate-500/30",
+                            AlertSeverity::Critical => "bg-sev-critical/10 text-sev-critical border-sev-critical/30",
+                            AlertSeverity::High => "bg-sev-high/10 text-sev-high border-sev-high/30",
+                            AlertSeverity::Medium => "bg-sev-medium/10 text-sev-medium border-sev-medium/30",
+                            AlertSeverity::Low => "bg-sev-low/10 text-sev-low border-sev-low/30",
                         };
 
                         let on_quick_adjust = move |delta: f64| {
@@ -273,15 +273,19 @@ pub fn RulesPage() -> impl IntoView {
                         };
 
                         view! {
-                            <div class="bg-slate-900/90 border border-slate-800/80 rounded-2xl p-6 shadow-xl backdrop-blur-md flex flex-col justify-between space-y-4">
+                            <div class=move || format!(
+                                "bg-ink-900/60 border border-ink-600 border-l-2 {} rounded-lg p-6 flex flex-col justify-between space-y-4 transition-colors",
+                                if is_enabled { "border-l-brand" } else { "border-l-ink-600" }
+                            )>
                                 <div>
                                     <div class="flex items-center justify-between gap-3 mb-2">
                                         <div class="flex items-center gap-2">
-                                            <span class=format!("inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border {}", sev_badge)>
+                                            <span class=format!("inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-bold border {}", sev_badge)>
                                                 {format!("{:?}", rule.severity).to_uppercase()}
                                             </span>
-                                            <span class="text-[10px] font-mono text-indigo-400 uppercase bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
-                                                {format!("{:?}", rule.rule_type)}
+                                            <span class="inline-flex items-center gap-1 text-[10px] font-mono text-brand bg-brand/10 px-2 py-0.5 rounded border border-brand/20">
+                                                <IconSliders class="w-3 h-3".to_string() />
+                                                {format!("{:?}", rule.rule_type).to_uppercase()}
                                             </span>
                                         </div>
 
@@ -289,14 +293,14 @@ pub fn RulesPage() -> impl IntoView {
                                         <button
                                             class=move || {
                                                 if is_enabled {
-                                                    "px-3 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition"
+                                                    "px-3 py-1 rounded-full text-[11px] font-mono font-semibold bg-brand/15 text-brand border border-brand/30 transition-colors"
                                                 } else {
-                                                    "px-3 py-1 rounded-full text-[11px] font-semibold bg-slate-800 text-slate-400 border border-slate-700 transition"
+                                                    "px-3 py-1 rounded-full text-[11px] font-mono font-semibold bg-ink-800 text-ink-500 border border-ink-600 transition-colors"
                                                 }
                                             }
                                             on:click=move |_| on_toggle_rule(rule_id, is_enabled)
                                         >
-                                            {if is_enabled { "Active ●" } else { "Disabled ○" }}
+                                            {if is_enabled { "ACTIVE" } else { "DISABLED" }}
                                         </button>
                                     </div>
 
@@ -306,23 +310,23 @@ pub fn RulesPage() -> impl IntoView {
                                 </div>
 
                                 // Metrics details & quick adjust buttons
-                                <div class="grid grid-cols-2 gap-3 p-3 bg-slate-950/60 rounded-xl border border-slate-800/60 text-xs">
+                                <div class="grid grid-cols-2 gap-3 p-3 bg-ink-950 rounded-md border border-ink-700 text-xs">
                                     <div>
-                                        <div class="text-[10px] text-slate-500 uppercase font-semibold">"Trigger Threshold"</div>
-                                        <div class="flex items-center justify-between mt-1">
+                                        <div class="text-[10px] text-ink-500 uppercase font-mono font-semibold tracking-wide">"Trigger threshold"</div>
+                                        <div class="flex items-center justify-between mt-1.5">
                                             <span class="font-mono font-bold text-slate-200">
                                                 {format!("{:.0} events", current_thresh)}
                                             </span>
                                             <div class="flex items-center gap-1">
                                                 <button
                                                     on:click=move |_| on_quick_adjust(-10.0)
-                                                    class="px-1.5 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px]"
+                                                    class="px-1.5 py-0.5 bg-ink-800 hover:bg-ink-700 text-slate-300 rounded text-[10px] font-mono"
                                                 >
                                                     "-10"
                                                 </button>
                                                 <button
                                                     on:click=move |_| on_quick_adjust(10.0)
-                                                    class="px-1.5 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px]"
+                                                    class="px-1.5 py-0.5 bg-ink-800 hover:bg-ink-700 text-slate-300 rounded text-[10px] font-mono"
                                                 >
                                                     "+10"
                                                 </button>
@@ -330,8 +334,8 @@ pub fn RulesPage() -> impl IntoView {
                                         </div>
                                     </div>
                                     <div>
-                                        <div class="text-[10px] text-slate-500 uppercase font-semibold">"Time Window"</div>
-                                        <div class="font-mono font-bold text-slate-200 mt-1">
+                                        <div class="text-[10px] text-ink-500 uppercase font-mono font-semibold tracking-wide">"Time window"</div>
+                                        <div class="font-mono font-bold text-slate-200 mt-1.5">
                                             {format!("{} seconds", current_window)}
                                         </div>
                                     </div>

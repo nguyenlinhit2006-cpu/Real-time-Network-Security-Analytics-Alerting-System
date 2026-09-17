@@ -2,6 +2,7 @@ use common::models::{Device, TrafficEvent};
 use leptos::prelude::*;
 
 use crate::api::client::ApiClient;
+use crate::components::icons::{IconClose, IconHistory, IconSearch};
 
 #[component]
 pub fn DevicesPage() -> impl IntoView {
@@ -54,21 +55,21 @@ pub fn DevicesPage() -> impl IntoView {
 
     view! {
         <div class="space-y-6">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-ink-700">
                 <div>
-                    <h1 class="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2.5">
-                        <span>"💻"</span>
-                        "Network Node & Device Inventory"
+                    <h1 class="text-2xl font-bold text-white tracking-tight">
+                        "Network node inventory"
                     </h1>
-                    <p class="text-xs text-slate-400 mt-1">
+                    <p class="text-xs text-ink-500 mt-1">
                         "Passive ARP and IP mapping of connected endpoints, servers, and IoT devices"
                     </p>
                 </div>
-                <div>
+                <div class="relative">
+                    <IconSearch class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-ink-500".to_string() />
                     <input
                         type="text"
                         placeholder="Search IP, MAC, hostname..."
-                        class="bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 w-64 transition"
+                        class="bg-ink-900 border border-ink-600 rounded-md pl-8 pr-3 py-2 text-xs font-mono text-slate-200 placeholder-ink-600 focus:outline-none focus:border-brand/60 w-64 transition-colors"
                         on:input=move |e| set_search_query.set(event_target_value(&e))
                     />
                 </div>
@@ -79,65 +80,66 @@ pub fn DevicesPage() -> impl IntoView {
                 if let Some(dev) = selected_device.get() {
                     view! {
                         <div class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-3xl w-full shadow-2xl space-y-4 max-h-[85vh] flex flex-col">
-                                <div class="flex items-center justify-between border-b border-slate-800/80 pb-3">
+                            <div class="bg-ink-900 border border-ink-600 rounded-lg p-6 max-w-3xl w-full shadow-console space-y-4 max-h-[85vh] flex flex-col">
+                                <div class="flex items-center justify-between border-b border-ink-700 pb-3">
                                     <div>
                                         <h3 class="text-base font-bold text-white flex items-center gap-2">
-                                            <span>"📜 Traffic History for"</span>
-                                            <span class="font-mono text-indigo-400">{format!("{}", dev.ip_address)}</span>
+                                            <IconHistory class="w-4 h-4 text-brand".to_string() />
+                                            <span>"Traffic history for"</span>
+                                            <span class="font-mono text-brand">{format!("{}", dev.ip_address)}</span>
                                         </h3>
-                                        <p class="text-xs text-slate-400 mt-0.5">
-                                            {format!("Host: {} | MAC: {}", dev.hostname.unwrap_or_else(|| "Unknown".to_string()), dev.mac_address.unwrap_or_else(|| "-".to_string()))}
+                                        <p class="text-xs text-ink-500 mt-0.5 font-mono">
+                                            {format!("host: {} · mac: {}", dev.hostname.unwrap_or_else(|| "unknown".to_string()), dev.mac_address.unwrap_or_else(|| "-".to_string()))}
                                         </p>
                                     </div>
                                     <button
                                         on:click=move |_| set_selected_device.set(None)
-                                        class="text-slate-400 hover:text-white text-base font-bold p-1"
+                                        class="text-ink-500 hover:text-white p-1"
                                     >
-                                        "✕"
+                                        <IconClose class="w-4 h-4".to_string() />
                                     </button>
                                 </div>
 
                                 <div class="overflow-y-auto flex-1">
                                     {move || {
                                         if history_loading.get() {
-                                            view! { <div class="text-xs text-slate-400 py-6 text-center">"Loading event history..."</div> }.into_any()
+                                            view! { <div class="text-xs text-ink-500 py-6 text-center font-mono">"Loading event history…"</div> }.into_any()
                                         } else if device_history.get().is_empty() {
-                                            view! { <div class="text-xs text-slate-500 py-6 text-center italic">"No recent traffic recorded for this host"</div> }.into_any()
+                                            view! { <div class="text-xs text-ink-500 py-6 text-center italic">"No recent traffic recorded for this host"</div> }.into_any()
                                         } else {
                                             view! {
                                                 <table class="w-full text-left text-xs text-slate-300">
-                                                    <thead class="text-slate-400 border-b border-slate-800 font-semibold uppercase text-[10px]">
+                                                    <thead class="text-ink-500 border-b border-ink-700 font-semibold uppercase text-[10px] font-mono">
                                                         <tr>
                                                             <th class="pb-2">"Time"</th>
                                                             <th class="pb-2">"Protocol"</th>
-                                                            <th class="pb-2">"Peer Endpoint"</th>
+                                                            <th class="pb-2">"Peer endpoint"</th>
                                                             <th class="pb-2">"Bytes"</th>
                                                             <th class="pb-2">"Flags"</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody class="divide-y divide-slate-800/40">
+                                                    <tbody class="divide-y divide-ink-700">
                                                         {device_history.get().into_iter().map(|ev| {
                                                             let peer = if ev.src_ip == dev.ip_address {
-                                                                format!("→ {}:{}", ev.dst_ip, ev.dst_port)
+                                                                format!("-> {}:{}", ev.dst_ip, ev.dst_port)
                                                             } else {
-                                                                format!("← {}:{}", ev.src_ip, ev.src_port)
+                                                                format!("<- {}:{}", ev.src_ip, ev.src_port)
                                                             };
                                                             view! {
-                                                                <tr class="hover:bg-slate-800/30 transition">
-                                                                    <td class="py-2 font-mono text-[11px] text-slate-400 whitespace-nowrap">
+                                                                <tr class="hover:bg-ink-800/40 transition-colors">
+                                                                    <td class="py-2 font-mono text-[11px] text-ink-500 whitespace-nowrap">
                                                                         {ev.time.format("%H:%M:%S").to_string()}
                                                                     </td>
-                                                                    <td class="py-2 uppercase font-bold text-[10px] text-indigo-400">
+                                                                    <td class="py-2 uppercase font-mono font-bold text-[10px] text-brand">
                                                                         {ev.protocol}
                                                                     </td>
                                                                     <td class="py-2 font-mono text-slate-200">
                                                                         {peer}
                                                                     </td>
-                                                                    <td class="py-2 font-mono text-emerald-400">
+                                                                    <td class="py-2 font-mono text-brand">
                                                                         {format!("{} B", ev.bytes_transferred)}
                                                                     </td>
-                                                                    <td class="py-2 font-mono text-slate-500 text-[10px]">
+                                                                    <td class="py-2 font-mono text-ink-500 text-[10px]">
                                                                         {ev.flags}
                                                                     </td>
                                                                 </tr>
@@ -157,20 +159,20 @@ pub fn DevicesPage() -> impl IntoView {
                 }
             }}
 
-            <div class="bg-slate-900/90 border border-slate-800/80 rounded-2xl p-6 shadow-2xl backdrop-blur-md overflow-x-auto">
+            <div class="bg-ink-900/60 border border-ink-600 rounded-lg p-6 overflow-x-auto">
                 <table class="w-full text-left text-xs text-slate-300">
-                    <thead class="text-slate-400 border-b border-slate-800/80 uppercase tracking-wider font-semibold">
+                    <thead class="text-ink-500 border-b border-ink-600 uppercase tracking-wider font-semibold text-[10px]">
                         <tr>
-                            <th class="pb-3 px-3">"IP Address"</th>
-                            <th class="pb-3 px-3">"MAC Address"</th>
-                            <th class="pb-3 px-3">"Hostname"</th>
-                            <th class="pb-3 px-3">"Device Type"</th>
-                            <th class="pb-3 px-3">"Trust Status"</th>
-                            <th class="pb-3 px-3">"Last Seen"</th>
-                            <th class="pb-3 px-3 text-right">"History"</th>
+                            <th class="pb-3 px-3 font-mono">"IP address"</th>
+                            <th class="pb-3 px-3 font-mono">"MAC address"</th>
+                            <th class="pb-3 px-3 font-mono">"Hostname"</th>
+                            <th class="pb-3 px-3 font-mono">"Type"</th>
+                            <th class="pb-3 px-3 font-mono">"Trust"</th>
+                            <th class="pb-3 px-3 font-mono">"Last seen"</th>
+                            <th class="pb-3 px-3 font-mono text-right">"History"</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-800/40">
+                    <tbody class="divide-y divide-ink-700">
                         <For
                             each=move || filtered_devices.get()
                             key=|d| d.id
@@ -178,35 +180,35 @@ pub fn DevicesPage() -> impl IntoView {
                                 let is_trusted = device.is_trusted;
                                 let dev_clone = device.clone();
                                 view! {
-                                    <tr class="hover:bg-slate-800/30 transition">
+                                    <tr class="hover:bg-ink-800/40 transition-colors">
                                         <td class="py-3.5 px-3 font-mono font-bold text-white whitespace-nowrap">
                                             {format!("{}", device.ip_address)}
                                         </td>
-                                        <td class="py-3.5 px-3 font-mono text-slate-400 whitespace-nowrap">
+                                        <td class="py-3.5 px-3 font-mono text-ink-500 whitespace-nowrap">
                                             {device.mac_address.clone().unwrap_or_else(|| "-".to_string())}
                                         </td>
                                         <td class="py-3.5 px-3 text-slate-200">
                                             {device.hostname.clone().unwrap_or_else(|| "Unknown".to_string())}
                                         </td>
                                         <td class="py-3.5 px-3 whitespace-nowrap">
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-800 text-slate-300 border border-slate-700">
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-ink-800 text-slate-300 border border-ink-600">
                                                 {device.device_type}
                                             </span>
                                         </td>
                                         <td class="py-3.5 px-3 whitespace-nowrap">
-                                            <span class=format!("inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold {}", if is_trusted { "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" } else { "bg-amber-500/10 text-amber-400 border border-amber-500/20" })>
-                                                {if is_trusted { "✓ Trusted" } else { "⚠ Untrusted" }}
+                                            <span class=format!("inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold {}", if is_trusted { "bg-brand/10 text-brand border border-brand/20" } else { "bg-sev-high/10 text-sev-high border border-sev-high/20" })>
+                                                {if is_trusted { "TRUSTED" } else { "UNTRUSTED" }}
                                             </span>
                                         </td>
-                                        <td class="py-3.5 px-3 text-slate-500 font-mono text-[11px] whitespace-nowrap">
+                                        <td class="py-3.5 px-3 text-ink-500 font-mono text-[11px] whitespace-nowrap">
                                             {device.last_seen.format("%Y-%m-%d %H:%M:%S").to_string()}
                                         </td>
                                         <td class="py-3.5 px-3 text-right whitespace-nowrap">
                                             <button
                                                 on:click=move |_| on_view_history(dev_clone.clone())
-                                                class="px-2.5 py-1 rounded-lg bg-indigo-600/15 hover:bg-indigo-600/25 text-indigo-400 border border-indigo-500/30 text-[11px] font-medium transition"
+                                                class="px-2.5 py-1 rounded bg-brand/10 hover:bg-brand/20 text-brand border border-brand/30 text-[11px] font-medium transition-colors"
                                             >
-                                                "View Events →"
+                                                "View events"
                                             </button>
                                         </td>
                                     </tr>

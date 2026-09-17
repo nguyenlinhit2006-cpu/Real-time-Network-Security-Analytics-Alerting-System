@@ -1,6 +1,8 @@
 use common::models::{Alert, AlertSeverity};
 use leptos::prelude::*;
 
+use crate::components::icons::{IconAlert, IconBell, IconClose};
+
 fn play_critical_sound() {
     let _ = js_sys::eval(r#"
         try {
@@ -37,30 +39,37 @@ pub fn ToastNotification(
         {move || {
             if let Some(alert) = latest_alert.get() {
                 let is_critical = alert.severity == AlertSeverity::Critical;
-                let bg = if is_critical { "bg-red-950/95 border-red-500/50 text-red-100" } else { "bg-slate-900/95 border-indigo-500/50 text-slate-100" };
+                let accent = if is_critical { "border-l-sev-critical" } else { "border-l-brand" };
+                let label_color = if is_critical { "text-sev-critical" } else { "text-brand" };
 
                 view! {
-                    <div class=format!("fixed bottom-6 right-6 max-w-sm w-full border rounded-2xl p-4 shadow-2xl backdrop-blur-md z-50 animate-bounce transition-all {}", bg)>
+                    <div class=format!("anim-slide-in fixed bottom-6 right-6 max-w-sm w-full bg-ink-900 border border-ink-600 border-l-2 {} rounded-md p-4 shadow-console z-50", accent)>
                         <div class="flex items-start justify-between gap-3">
-                            <div class="flex items-center gap-2">
-                                <span class="text-xl">{if is_critical { "🚨" } else { "🔔" }}</span>
+                            <div class="flex items-start gap-2.5">
+                                <span class=format!("mt-0.5 {}", label_color)>
+                                    {if is_critical {
+                                        view! { <IconAlert class="w-4 h-4".to_string() /> }.into_any()
+                                    } else {
+                                        view! { <IconBell class="w-4 h-4".to_string() /> }.into_any()
+                                    }}
+                                </span>
                                 <div>
-                                    <div class="text-xs font-bold uppercase tracking-wider text-red-400">
-                                        {format!("NEW {:?} ALERT", alert.severity)}
+                                    <div class=format!("text-[10px] font-mono font-bold uppercase tracking-wide {}", label_color)>
+                                        {format!("new {:?} alert", alert.severity)}
                                     </div>
-                                    <div class="text-xs font-semibold mt-0.5 text-white">
+                                    <div class="text-xs font-semibold mt-1 text-white">
                                         {alert.title}
                                     </div>
-                                    <div class="text-[11px] text-slate-300 mt-1 truncate">
+                                    <div class="text-[11px] text-ink-500 mt-1 truncate">
                                         {alert.description}
                                     </div>
                                 </div>
                             </div>
                             <button
-                                class="text-slate-400 hover:text-white text-xs font-bold p-1"
+                                class="text-ink-500 hover:text-white p-0.5 shrink-0"
                                 on:click=move |_| set_latest_alert.set(None)
                             >
-                                "✕"
+                                <IconClose class="w-3.5 h-3.5".to_string() />
                             </button>
                         </div>
                     </div>
